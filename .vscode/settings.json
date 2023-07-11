@@ -1,0 +1,9 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none",
+    "python.testing.unittestEnabled": false, // ms-python.python
+    "window.zoomLevel": 0,
+    "editor.fontSize": 18,
+}
