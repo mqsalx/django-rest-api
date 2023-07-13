@@ -20,7 +20,8 @@ def recipe_api_list(request):
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = RecipeSerializer(
-            data=request.data
+            data=request.data,
+            context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
