@@ -1,16 +1,13 @@
 from rest_framework import serializers
-from .models import Category, Recipe
-from django.contrib.auth.models import User
+from .models import Recipe
 from tag.models import Tag
+from authors.validators import AuthorRecipeValidator
 
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['id', 'name', 'slug']
-    # id = serializers.IntegerField()
-    # name = serializers.CharField(max_length=255)
-    # slug = serializers.SlugField()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -20,17 +17,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             'id', 'title', 'description',
             'author', 'category', 'tags',
             'public', 'preparation', 'tag_objects', 'tag_links',
+            'preparation_time', 'preparation_time_unit', 'servings',
+            'servings_unit',
+            'preparation_steps', 'cover'
         ]
-    # category_id = serializers.PrimaryKeyRelatedField(
-    #     queryset=Category.objects.all(),
-    # )
-    # category_name = serializers.StringRelatedField(
-    #     source='category'
-    # )
-    # author = serializers.StringRelatedField()
-    # author_id = serializers.PrimaryKeyRelatedField(
-    #     queryset=User.objects.all()
-    # )
     public = serializers.BooleanField(
         source='is_published',
         read_only=True,
@@ -56,3 +46,19 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_preparation(self, recipe):
         return f'{recipe.preparation_time} {recipe.preparation_time_unit}'
+
+    def validate(self, attrs):
+        super_validate = super().validate(attrs)
+        AuthorRecipeValidator(
+            data=attrs,
+            ErrorClass=serializers.ValidationError,
+        )
+        return super_validate
+
+    def validate_title(self, value):
+        title = value
+
+        if len(title) < 5:
+            raise serializers.ValidationError('Must have at least 5 chars.')
+
+        return title
